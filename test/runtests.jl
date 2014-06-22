@@ -30,7 +30,7 @@ immutable TTTState <: AbstractGameState
 		x, y = opts
 		if prev.board[x, y] === SQUARE_N
 			s = 0
-			f = {}
+			f = Symbol[]
 			p = prev.player===PLAYER_X? PLAYER_O : PLAYER_X
 			b = copy(prev.board)
 			b[x, y] = prev.player
@@ -63,7 +63,7 @@ import GameIter: options, move
 options(curr::TTTState, N::Int) = (N%3+1, fld(N,3)%3+1)
 move(prev::TTTState, opts::TTTOptions) = TTTState(prev, opts)
 
-for fn in [minimax_naive, minimax_prune]
+for fn in [minimax_naive, x->minimax_depth(x,uint(7)), minimax_prune]
 	println("$fn")
 	state = TTTState()
 	println(state.board)
@@ -74,5 +74,6 @@ for fn in [minimax_naive, minimax_prune]
 		gc()
 		println(state.board)
 	end
+	@assert state.score == 0
 	println("===")
 end

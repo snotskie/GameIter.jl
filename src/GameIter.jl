@@ -8,23 +8,26 @@ export minimax_depth, minimax_prune, minimax_naive
 
 abstract AbstractGameState
 
-const FLAG_ILLEGAL = :FLAG_ILLEGAL
+const FLAG_ILLEGAL  = :FLAG_ILLEGAL
 const FLAG_TERMINAL = :FLAG_TERMINAL
 
 options()                                = ()
 move{T<:AbstractGameState}(S::T, opts)   = S
 
-start{T<:AbstractGameState}(S::T)        = 0
-done{T<:AbstractGameState}(S::T, N::Int) = options(S, 0) == options(S, N+1)
-next{T<:AbstractGameState}(S::T, N::Int) = (move(S, options(S, N)), N+1)
+start{T<:AbstractGameState}(S::T)               = (0, false)
+done{T<:AbstractGameState}(S::T, N::(Int,Bool)) = N[2] && options(S,0)==options(S,N[1])
+next{T<:AbstractGameState}(S::T, N::(Int,Bool)) = (move(S,options(S,N[1])), (N[1]+1, true))
 
-# TODO make this logic actually work
-minimax_depth{T<:AbstractGameState}(S::T, depth::Int) = __minimax_depth(S, depth)[1]
-minimax_naive{T<:AbstractGameState}(S::T) = __minimax_depth(S, typemax(Int))[1]
-function __minimax_depth{T<:AbstractGameState}(S::T, depth::Int)
+minimax_depth{T<:AbstractGameState}(S::T, depth) = __minimax_depth(S, uint(depth))[1]
+minimax_naive{T<:AbstractGameState}(S::T)        = __minimax_depth(S, typemax(Uint))[1]
+# TODO don't use -2 and 2, but typemin+1 and typemax-1
+minimax_prune{T<:AbstractGameState}(S::T)        = __minimax_prune(S, convert(typeof(S.score), -2),
+                                                       convert(typeof(S.score), 2))[1]
+
+function __minimax_depth{T<:AbstractGameState}(S::T, depth::Uint)
 	if FLAG_ILLEGAL in S.flags
 		return (nothing, nothing)
-	elseif depth <= 0 || FLAG_TERMINAL in S.flags
+	elseif depth == 0 || FLAG_TERMINAL in S.flags
 		return (S, S.score)
 	else
 		max_score = typemin(typeof(S.score))
@@ -43,7 +46,7 @@ function __minimax_depth{T<:AbstractGameState}(S::T, depth::Int)
 	end
 end
 
-minimax_prune{T<:AbstractGameState}(S::T) = __minimax_prune(S, typemin(typeof(S.score))+1, typemax(typeof(S.score))-1)[1]
+# TODO make this logic actually work
 function __minimax_prune{T<:AbstractGameState}(S::T, alpha, beta)
 	if FLAG_ILLEGAL in S.flags
 		return (nothing, nothing)
@@ -57,10 +60,9 @@ function __minimax_prune{T<:AbstractGameState}(S::T, alpha, beta)
 				if -score > alpha
 					alpha = -score
 					best_child = child
-				end
-
-				if beta <= alpha
-					break
+					if beta <= alpha
+						break
+					end
 				end
 			end
 		end
