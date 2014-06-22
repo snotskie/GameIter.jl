@@ -32,7 +32,7 @@ immutable MyGameState <: AbstractGameState
 	player::Symbol
 	board::Array{Symbol,2}
 	MyGameState() = new(0, Symbol[], :X, fill(:N, 3, 3))
-	function MyGameState(prev::MyGameState, options)
+	function MyGameState(prev::MyGameState, opts)
 		# body
 	end
 end
@@ -56,7 +56,7 @@ options(state::MyGameState, N::Int) = (N%3+1, fld(N,3)%3+1)
 #            malformed states are impossible, but, come on, it's just tic-tac-toe
 immutable MyGameState <: AbstractGameState
 	# ...
-	function MyGameState(prev::MyGameState, options)
+	function MyGameState(prev::MyGameState, opts)
 		x, y = opts
 		if prev.board[x, y] === :X
 			s = 0
@@ -98,3 +98,26 @@ while !(FLAG_TERMINAL in game_state.board)
 	println(game_state.board)
 end
 ```
+
+## Iterator API
+GameIter is based on the Julia Interator API, meaning that iterating through child
+states is as easy as:
+```julia
+for child_state in game_state
+	# body
+end
+```
+
+The magic happens when Julia translates this into:
+```julia
+iter_state = start(game_state)
+while !done(game_state, iter_state)
+	(child_state, iter_state) = next(game_state, iter_state)
+	# body
+end
+```
+
+GameIter manages an integer value that's passed between the `start`, `done`, and `next`
+functions. The user defined `options` function is used to determine when the loop is
+finished--when one full cycle is detected--and to create child states through a call to
+`MyGameState(prev, opts)`.
