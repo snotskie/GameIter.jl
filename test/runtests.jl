@@ -55,12 +55,10 @@ immutable TTTState <: AbstractGameState
 	end
 end
 
-# options and move by GameIter algorithms
+# options required by GameIter algorithms
 # options returns a tuple based on N, so for loops can "cycle through" options
-# move returns a state after prev where opts are taken
-import GameIter: options, move
+import GameIter: options
 options(curr::TTTState, N::Int) = (N%3+1, fld(N,3)%3+1)
-move(prev::TTTState, opts::TTTOptions) = TTTState(prev, opts)
 
 for fn in [minimax_naive, x->minimax_depth(x,uint(7)), minimax_prune]
 	println("$fn")

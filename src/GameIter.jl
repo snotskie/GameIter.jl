@@ -11,12 +11,10 @@ abstract AbstractGameState
 const FLAG_ILLEGAL  = :FLAG_ILLEGAL
 const FLAG_TERMINAL = :FLAG_TERMINAL
 
-options()                                = ()
-move{T<:AbstractGameState}(S::T, opts)   = S
-
+options()                                       = ()
 start{T<:AbstractGameState}(S::T)               = (0, false)
 done{T<:AbstractGameState}(S::T, N::(Int,Bool)) = N[2] && options(S,0)==options(S,N[1])
-next{T<:AbstractGameState}(S::T, N::(Int,Bool)) = (move(S,options(S,N[1])), (N[1]+1, true))
+next{T<:AbstractGameState}(S::T, N::(Int,Bool)) = (T(S,options(S,N[1])), (N[1]+1, true))
 
 minimax_depth{T<:AbstractGameState}(S::T, depth) = __minimax_depth(S, uint(depth))[1]
 minimax_naive{T<:AbstractGameState}(S::T)        = __minimax_depth(S, typemax(Uint))[1]
