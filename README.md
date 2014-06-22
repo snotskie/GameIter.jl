@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/snotskie/GameIter.jl.svg)](https://travis-ci.org/snotskie/GameIter.jl)
 
-GameIter.jl provides a simple framework based on Julia's Iterator API and inspired by ValueDispatch.jl.
+GameIter.jl provides a simple framework based on Julia's Iterator API and inspired by [ValueDispatch.jl](https://github.com/zachallaun/ValueDispatch.jl).
 
 ## Getting Started
 ```julia
@@ -121,3 +121,24 @@ GameIter manages an integer value that's passed between the `start`, `done`, and
 functions. The user defined `options` function is used to determine when the loop is
 finished--when one full cycle is detected--and to create child states through a call to
 `MyGameState(prev, opts)`.
+
+## Inspired by ValueDispatch
+From the ValueDispatch.jl documentation:
+```julia
+@dispatch fizzbuzz(n::Int) = (n % 3 == 0, n % 5 == 0)
+
+@on (true,true)  fizzbuzz(n) = "fizzbuzz"
+@on (true,false) fizzbuzz(n) = "fizz"
+@on (false,true) fizzbuzz(n) = "buzz"
+@on :default     fizzbuzz(n) = n
+```
+
+The `options` function is inspired by the first line, and the second constructor
+is inspired by the remaining lines. Note how we can collect the first five
+children of a state by writing:
+```julia
+children_states = [MyGameState(parent_state, options(parent_state, N)) for N in 0:4]
+```
+
+The `for child in parent` syntax can be thought of as a version of this that detects
+how many children there are by watching for a "full option loop."
