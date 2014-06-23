@@ -60,12 +60,12 @@ end
 import GameIter: options
 options(curr::TTTState, N::Int) = (N%3+1, fld(N,3)%3+1)
 
-for fn in [minimax_naive, x->minimax_depth(x,uint(7)), minimax_prune]
+for fn in [minimax, x->minimax_depth(x,uint(6)), minimax_prune, x->minimax_prune_depth(x,uint(6))]
 	println("$fn")
 	state = TTTState()
 	println(state.board)
 	println()
-	while !(FLAG_TERMINAL in state.flags)
+	@time while !(FLAG_TERMINAL in state.flags)
 		@assert !(FLAG_ILLEGAL in state.flags)
 		state = fn(state)
 		@assert state !== nothing

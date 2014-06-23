@@ -88,8 +88,8 @@ immutable MyGameState <: AbstractGameState
 end
 
 # Step Six: minimax!
-# Note:     GameIter exports three minimax implementations, minimax_naive,
-#           minimax_depth, and minimax_prune.
+# Note:     GameIter exports four minimax implementations, minimax,
+#           minimax_depth, minimax_prune, and minimax_prune_depth.
 #           we'll just use the naive version for this example.
 game_state = MyGameState()
 println(game_state.board)
