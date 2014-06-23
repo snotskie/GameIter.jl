@@ -71,9 +71,10 @@ function __minimax_prune{T<:AbstractGameState}(S::T, depth::Uint, scores::Dict)
 		return (S, S.score)
 	else
 		scores[S.player] = typemin(typeof(S.score))+1
+		copy_scores = copy(scores)
 		best_child = nothing
 		for child in S
-			leaf, score = __minimax_prune(child, depth-1, copy(scores))
+			leaf, score = __minimax_prune(child, depth-1, copy_scores)
 			if leaf !== nothing
 				if child.player != S.player
 					score = -score
